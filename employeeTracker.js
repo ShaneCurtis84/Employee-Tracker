@@ -40,14 +40,18 @@ async function mainMenu() {
                 'View Employees By Department',
                 'View Employees By Role',
                 'View Employees By Manager',
-               
+                'View Budget By Department',
+                'Update Employee Role',
+                'Update Employee Manager',
+                'Update Department',
+                'Add Employee',
+                'Add Role',
+                'Add Department',
+
             ]
 
         }
     ]);
-
-
-
 
 
 
@@ -58,13 +62,28 @@ async function mainMenu() {
             return viewAllEmployees()
 
         case 'View Employees By Department':
-                return viewByDepartment();
+            return viewByDepartment();
 
         case 'View Employees By Role':
             return viewByRole();
 
         case 'View Employees By Manager':
-             return viewByManager();    
+            return viewByManager();
+
+        case 'View Budget By Department':
+            return viewBudgetByDepartment();
+
+        case 'Update Employee Role':
+            return updateEmployeeRole();
+
+        case 'Update Employee Manager':
+            return updateEmployeeManager();
+
+        case 'Add Employee':
+            return addEmployee();
+
+            
+
 
 
 
@@ -74,14 +93,15 @@ async function mainMenu() {
 };
 
 
+
 function viewAllEmployees() {
-    connection.query("SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.department_name, roles.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN roles on employee.role_id = roles.id LEFT JOIN department on roles.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;",
-     (err, res) => {
-        if (err) throw err;
-        console.table(res);
-        console.log(`\n`);
-        mainMenu();
-    });
+    connection.query("SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.department_name, roles.salary, manager_name FROM employee LEFT JOIN roles on employee.role_id = roles.id LEFT JOIN department on roles.department_id = department.id LEFT JOIN manager ON employee.manager_id = manager.id;",
+        (err, res) => {
+            if (err) throw err;
+            console.table(res);
+            console.log(`\n`);
+            mainMenu();
+        });
 };
 
 function viewByDepartment() {
@@ -113,8 +133,132 @@ function viewByManager() {
 };
 
 
+function viewBudgetByDepartment() {
+    connection.query("SELECT department_id, department.department_name, SUM(salary) AS Amount FROM roles LEFT JOIN department on roles.department_id = department.id GROUP BY department_id;", (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        console.log(`\n`);
+        mainMenu();
+    });
+};
 
 
+async function updateEmployeeRole() {
+
+    try {
+        const employee = await connection.query(`SELECT * FROM employee`);
+        const employeeList = employee.map((employee) => ({
+            name: `${employee.first_name} ${employee.last_name}`,
+            value: employee.id,
+        }));
+        const roles = await connection.query(`SELECT * FROM roles`);
+        const listOfRoles = roles.map((roles) => ({
+            name: roles.title,
+            value: roles.id,
+        }));
+
+        const updateRole = await inquirer.prompt([
+            {
+                type: 'list',
+                message: 'Select employee to update',
+                name: 'employeeSelection',
+                choices: employeeList,
+            },
+            {
+                type: 'list',
+                message: 'Please select a new role',
+                name: 'rolesSelection',
+                choices: listOfRoles,
+            }
+
+        ])
+
+
+        connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [
+            updateRole.rolesSelection,
+            updateRole.employeeSelection,
+        ]);
+        console.log(
+            `\n ---Role has been updated!--- `
+                
+        );
+        mainMenu()
+
+    } catch (err) {
+        console.log(err);
+        mainMenu();
+    };
+}
+
+
+async function updateEmployeeManager() {
+
+    try {
+        const employee = await connection.query(`SELECT * FROM employee`);
+        const employeeList = employee.map((employee) => ({
+            name: `${employee.first_name} ${employee.last_name}`,
+            value: employee.id,
+        }));
+        const manager = await connection.query(`SELECT * FROM manager`);
+        const listOfManagers = manager.map((manager) => ({
+            name: `${manager.manager_name}`,
+            value: manager.id,
+        }));
+
+        const updateRole = await inquirer.prompt([
+            {
+                type: 'list',
+                message: 'Select employee to update',
+                name: 'employeeSelection',
+                choices: employeeList,
+            },
+            {
+                type: 'list',
+                message: 'Please select a new manager',
+                name: 'managerSelection',
+                choices: listOfManagers,
+            }
+
+        ])
+
+
+        connection.query("UPDATE employee SET manager_id = ? WHERE id = ?", [
+            updateRole.managerSelection,
+            updateRole.employeeSelection,
+        ]);
+        console.log(
+            `\n ---Employees manager has been updated!--- `
+                
+        );
+        mainMenu()
+
+    } catch (err) {
+        console.log(err);
+        mainMenu();
+    };
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+async function newEmployee() {
+
+
+}
 
 mainMenu()
 
