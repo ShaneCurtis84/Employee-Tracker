@@ -31,7 +31,7 @@ function Welcome() {
 
 async function mainMenu() {
 
-
+    
     console.log(`\n`)
     console.log(`\n ---Main Menu---`)
     console.log(`\n`)
@@ -147,7 +147,7 @@ function viewByDepartment() {
 };
 
 function viewByRole() {
-    connection.query("SELECT employee.id, roles.title,department.department_name, employee.first_name, employee.last_name, roles.salary, manager_name FROM employee LEFT JOIN roles on employee.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN manager ON employee.manager_id = manager.id;", (err, res) => {
+    connection.query("SELECT employee.id, roles.title, department.department_name, employee.first_name, employee.last_name, roles.salary, manager_name FROM employee LEFT JOIN roles on employee.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN manager ON employee.manager_id = manager.id ORDER BY roles.title;", (err, res) => {
         if (err) throw err;
         console.log(`\n ---View Employees by Role---`);
         console.log(`\n`);
@@ -297,7 +297,7 @@ async function addNewEmployee() {
             value: manager.id,
         }));
 
-
+        
 
 
 
@@ -306,13 +306,13 @@ async function addNewEmployee() {
                 type: "input",
                 message: "Enter the first name of the employee you would like to add:",
                 name: "first_name",
-
+                
             },
             {
                 type: "input",
                 message: "Enter the last name of the employee you would like to add:",
                 name: "last_name",
-
+               
             },
             {
                 type: "list",
@@ -457,7 +457,7 @@ async function addManager() {
                 type: "input",
                 message: "Enter the managers full name:",
                 name: "manager_name",
-
+                
             }
         ])
         const newManager = await connection.query(
@@ -533,7 +533,7 @@ async function removeEmployeeDepartment() {
                 type: "list",
                 message: "Select the department you would like to remove:",
                 name: "removeDepartment",
-
+                
                 choices: departmentsList,
 
 
@@ -636,11 +636,11 @@ async function removeManager() {
 
 function exit() {
     console.log(
-        `\n Thanks for using Employee Tracker!"`
+      `\n Thanks for using Employee Tracker!"`
     );
     connection.end();
     process.exit();
-}
+  }
 
 
 
