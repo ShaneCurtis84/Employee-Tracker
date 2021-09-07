@@ -30,7 +30,7 @@
 
   To run the app simply run ``` npm start ```
   
-  A video guide to using the Employee Tracker
+  A video guide to using the Employee Tracker https://drive.google.com/file/d/1L5Upgl17mFCDUCsTErV3SubyazsQIoOY/view
   
   
 
